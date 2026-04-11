@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>NeoTab</title>
+        <link rel="icon" type="image/x-icon" href="icons/favicon.svg" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body class="theme-dark wallpaper-default">
+        <div id="wallpaper-overlay"></div>
+        <div class="grid-lines"></div>
+
+        <!-- FAB Sidebar -->
+        <div class="fab-group">
+            <button class="fab fab-accent" id="btn-add-board" title="New Board">
+                <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <rect x="2.5" y="2.5" width="6" height="6" rx="1.5" />
+                    <rect x="11.5" y="2.5" width="6" height="6" rx="1.5" />
+                    <rect x="2.5" y="11.5" width="6" height="6" rx="1.5" />
+                    <path d="M14.5 11.5v6M11.5 14.5h6" />
+                </svg>
+            </button>
+
+            <button class="fab" id="btn-wallpaper" title="Wallpaper">
+                <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <rect x="2" y="3" width="16" height="14" rx="2" />
+                    <circle cx="7" cy="8" r="1.5" />
+                    <path d="M2 14l4.5-4.5 3 3 2.5-3 4 4.5" />
+                </svg>
+            </button>
+
+            <button class="fab" id="btn-privacy" title="Privacy Mode">
+                <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path
+                        d="M1.5 10S4.5 4 10 4s8.5 6 8.5 6-3 6-8.5 6S1.5 10 1.5 10z"
+                    />
+                    <circle cx="10" cy="10" r="2.5" />
+                </svg>
+            </button>
+
+            <button class="fab" id="btn-export" title="Export Data">
+                <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M10 3.5v8M6.5 8L10 11.5 13.5 8" />
+                    <path
+                        d="M3.5 14.5v.5A1.5 1.5 0 005 16.5h10a1.5 1.5 0 001.5-1.5v-.5"
+                    />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Wallpaper Panel -->
+        <div class="panel" id="wallpaper-panel">
+            <div class="panel-header">
+                <span class="panel-title">Appearance</span>
+                <button class="icon-btn" id="close-wallpaper">
+                    <svg
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                    >
+                        <path d="M3 3l10 10M13 3L3 13" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="style-toggle">
+                <button class="style-btn active" data-mode="dark">Dark</button>
+                <button class="style-btn" data-mode="light">Light</button>
+            </div>
+
+            <div class="wp-section-label">DARK</div>
+            <div class="wallpaper-grid" id="wallpaper-grid">
+                <div class="wallpaper-item active" data-wp="default">
+                    <div class="wp-preview wp-default">
+                        <span>Default</span>
+                    </div>
+                </div>
+                <div class="wallpaper-item" data-wp="crimson">
+                    <div class="wp-preview wp-crimson"></div>
+                </div>
+                <div class="wallpaper-item" data-wp="ocean">
+                    <div class="wp-preview wp-ocean"></div>
+                </div>
+                <div class="wallpaper-item" data-wp="aurora">
+                    <div class="wp-preview wp-aurora"></div>
+                </div>
+                <div class="wallpaper-item" data-wp="midnight">
+                    <div class="wp-preview wp-midnight"></div>
+                </div>
+                <div class="wallpaper-item" data-wp="ember">
+                    <div class="wp-preview wp-ember"></div>
+                </div>
+            </div>
+
+            <div class="wp-section-label" style="margin-top: 14px">LIGHT</div>
+            <div class="wallpaper-grid" id="wallpaper-grid-light">
+                <div class="wallpaper-item" data-wp="paper">
+                    <div class="wp-preview wp-paper"><span>Default</span></div>
+                </div>
+                <div class="wallpaper-item" data-wp="blush">
+                    <div class="wp-preview wp-blush"></div>
+                </div>
+                <div class="wallpaper-item" data-wp="mint">
+                    <div class="wp-preview wp-mint"></div>
+                </div>
+            </div>
+
+            <div class="wp-section-label" style="margin-top: 14px">CUSTOM</div>
+            <div class="wallpaper-grid" id="wallpaper-grid-custom"></div>
+
+            <label class="wp-upload-btn">
+                <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M10 13V4M6.5 7.5L10 4l3.5 3.5" />
+                    <path
+                        d="M3.5 14.5v.5A1.5 1.5 0 005 16.5h10a1.5 1.5 0 001.5-1.5v-.5"
+                    />
+                </svg>
+                Upload image
+                <input
+                    type="file"
+                    id="wp-upload-input"
+                    accept="image/*"
+                    style="display: none"
+                />
+            </label>
+        </div>
+
+        <!-- Add Board Modal -->
+        <div class="modal-overlay" id="board-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <span>New Board</span>
+                    <button class="icon-btn" id="close-board-modal">
+                        <svg
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.2"
+                            stroke-linecap="round"
+                        >
+                            <path d="M3 3l10 10M13 3L3 13" />
+                        </svg>
+                    </button>
+                </div>
+                <input
+                    class="modal-input"
+                    id="board-name-input"
+                    placeholder="Board name…"
+                    autocomplete="off"
+                />
+                <button class="modal-btn" id="confirm-add-board">
+                    Create Board
+                </button>
+            </div>
+        </div>
+
+        <!-- Add Link Modal -->
+        <div class="modal-overlay" id="link-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <span>Add Link</span>
+                    <button class="icon-btn" id="close-link-modal">
+                        <svg
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.2"
+                            stroke-linecap="round"
+                        >
+                            <path d="M3 3l10 10M13 3L3 13" />
+                        </svg>
+                    </button>
+                </div>
+                <input
+                    class="modal-input"
+                    id="link-name-input"
+                    placeholder="Name"
+                    autocomplete="off"
+                />
+                <input
+                    class="modal-input"
+                    id="link-url-input"
+                    placeholder="URL — https://…"
+                    autocomplete="off"
+                />
+                <input
+                    class="modal-input"
+                    id="link-desc-input"
+                    placeholder="Description (optional)"
+                    autocomplete="off"
+                />
+                <button class="modal-btn" id="confirm-add-link">
+                    Add Link
+                </button>
+            </div>
+        </div>
+
+        <!-- App shell -->
+        <div class="app">
+            <div class="topbar">
+                <button class="tab-scroll-btn" id="tab-scroll-left">
+                    <svg
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M10 3L5 8l5 5" />
+                    </svg>
+                </button>
+                <div class="tabs-container" id="tabs-container"></div>
+                <button class="tab-add-btn" id="btn-add-page" title="New Page">
+                    <svg
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                    >
+                        <path d="M8 2v12M2 8h12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="boards-area" id="boards-area"></div>
+        </div>
+
+        <script src="app.js"></script>
+    </body>
+</html>
