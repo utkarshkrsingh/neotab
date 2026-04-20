@@ -27,6 +27,13 @@
     --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
     --font: "Inter", system-ui, sans-serif;
     --transition: 0.15s ease;
+    /* Glassmorphism */
+    --glass-blur: 12px;
+    --glass-blur-heavy: 20px;
+    --glass-bg: rgba(22, 27, 34, 0.55);
+    --glass-bg-heavy: rgba(22, 27, 34, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.09);
+    --glass-border-hover: rgba(255, 255, 255, 0.18);
 }
 
 body.theme-light {
@@ -38,6 +45,10 @@ body.theme-light {
     --text: #1c2333;
     --text-sub: #57606a;
     --text-muted: #aab0b8;
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-bg-heavy: rgba(255, 255, 255, 0.68);
+    --glass-border: rgba(0, 0, 0, 0.09);
+    --glass-border-hover: rgba(0, 0, 0, 0.18);
 }
 
 /* ── Base ── */
@@ -194,8 +205,10 @@ body.wallpaper-mint #wallpaper-overlay {
     gap: 6px;
     padding: 6px 16px;
     border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--bg2);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
     color: var(--text-sub);
     font-family: var(--font);
     font-size: 13px;
@@ -255,12 +268,14 @@ body.wallpaper-mint #wallpaper-overlay {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg2);
-    border: 1px solid var(--border);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
     border-radius: 999px;
     cursor: pointer;
     color: var(--text-sub);
     transition: all var(--transition);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 .tab-scroll-btn svg,
 .tab-add-btn svg {
@@ -284,15 +299,17 @@ body.wallpaper-mint #wallpaper-overlay {
 
 /* ── Board card ── */
 .board {
-    background: var(--bg2);
-    border: 1px solid var(--border);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius-md);
     padding: 14px;
     animation: fadeUp 0.3s ease both;
     transition: border-color var(--transition);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
 }
 .board:hover {
-    border-color: var(--border-hover);
+    border-color: var(--glass-border-hover);
 }
 
 @keyframes fadeUp {
@@ -544,12 +561,13 @@ body.privacy .link-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--border);
-    background: var(--bg2);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
     color: var(--text-sub);
     cursor: pointer;
     box-shadow: var(--shadow-sm);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
     transition: all var(--transition);
 }
 .fab svg {
@@ -585,15 +603,17 @@ body.privacy .link-icon {
     max-height: 78vh;
     overflow-y: auto;
     overflow-x: hidden;
-    background: var(--bg2);
-    border: 1px solid var(--border);
+    background: var(--glass-bg-heavy);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
     padding: 16px;
     z-index: 99;
     box-shadow: var(--shadow-md);
     display: none;
     scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    scrollbar-color: var(--glass-border) transparent;
+    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(200%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(200%);
 }
 .panel.open {
     display: block;
@@ -761,8 +781,8 @@ body.privacy .link-icon {
 }
 
 .modal {
-    background: var(--bg2);
-    border: 1px solid var(--border);
+    background: var(--glass-bg-heavy);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
     padding: 22px 20px;
     width: 320px;
@@ -771,6 +791,8 @@ body.privacy .link-icon {
     gap: 10px;
     box-shadow: var(--shadow-md);
     animation: fadeUp 0.18s ease;
+    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(200%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(200%);
 }
 .modal-header {
     display: flex;
@@ -911,4 +933,451 @@ body.wallpaper-custom #wallpaper-overlay {
     background-position: center;
     background-repeat: no-repeat;
     opacity: 1;
+}
+
+/* ── Link row (drag-and-drop wrapper) ── */
+.link-row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition);
+    position: relative;
+}
+.link-row:hover {
+    background: var(--bg3);
+}
+.link-row .link-item {
+    flex: 1;
+    min-width: 0;
+    border-radius: 0;
+    padding: 6px 4px 6px 5px;
+}
+.link-row .link-item:hover {
+    background: none;
+}
+.link-row.dragging {
+    opacity: 0.4;
+}
+.link-row.drag-over {
+    outline: 1.5px solid var(--accent);
+    outline-offset: -1px;
+    background: var(--accent-dim);
+}
+
+/* ── Drag handle ── */
+.drag-handle {
+    flex-shrink: 0;
+    width: 16px;
+    height: 28px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: var(--text-muted);
+    opacity: 0.5;
+    padding: 0 1px;
+}
+.drag-handle:active {
+    cursor: grabbing;
+}
+.drag-handle svg {
+    width: 10px;
+    height: 14px;
+}
+.link-row:hover .drag-handle {
+    display: flex;
+}
+
+/* ── Link edit button ── */
+.link-edit-btn {
+    display: none;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    border-radius: 4px;
+    transition: color var(--transition);
+}
+.link-edit-btn svg {
+    width: 10px;
+    height: 10px;
+}
+.link-row:hover .link-edit-btn {
+    display: flex;
+}
+.link-edit-btn:hover {
+    color: var(--accent);
+}
+
+/* Move del btn styles to work on row level */
+.link-row .link-del-btn {
+    display: none;
+    flex-shrink: 0;
+}
+.link-row:hover .link-del-btn {
+    display: flex;
+}
+
+/* ── Icon picker in link modal ── */
+.icon-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 10px;
+    background: var(--bg3);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}
+.icon-picker-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-sub);
+}
+.icon-picker-optional {
+    font-weight: 400;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+.icon-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+.icon-preview {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.icon-preview img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: block;
+}
+.icon-preview svg {
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+}
+.icon-picker-inputs {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+.icon-picker-inputs .modal-input {
+    font-size: 12px;
+    padding: 7px 9px;
+}
+.icon-upload-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-sub);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all var(--transition);
+    user-select: none;
+}
+.icon-upload-btn svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+}
+.icon-upload-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+}
+.icon-clear-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #f87171;
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 0;
+    transition: opacity var(--transition);
+}
+.icon-clear-btn svg {
+    width: 9px;
+    height: 9px;
+}
+.icon-clear-btn:hover {
+    opacity: 0.75;
+}
+
+/* ── No-glass override ── */
+/* Strip blur from all glassed elements */
+body.no-glass .board,
+body.no-glass .tab,
+body.no-glass .tab-scroll-btn,
+body.no-glass .tab-add-btn,
+body.no-glass .fab,
+body.no-glass .panel,
+body.no-glass .modal {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Restore solid backgrounds only for non-accent elements */
+body.no-glass .board,
+body.no-glass .tab:not(.active),
+body.no-glass .tab-scroll-btn,
+body.no-glass .tab-add-btn,
+body.no-glass .fab:not(.fab-accent):not(.privacy-on),
+body.no-glass .panel,
+body.no-glass .modal {
+    background: var(--bg2) !important;
+    border-color: var(--border) !important;
+}
+
+/* Active tab keeps its accent color */
+body.no-glass .tab.active {
+    background: var(--accent) !important;
+    color: #0a1008 !important;
+    border-color: transparent !important;
+}
+
+/* Accent FAB keeps its green */
+body.no-glass .fab.fab-accent {
+    background: var(--accent) !important;
+    border-color: transparent !important;
+    color: #0a1008 !important;
+}
+
+/* Privacy FAB keeps its red */
+body.no-glass .fab.privacy-on {
+    background: #ef4444 !important;
+    border-color: transparent !important;
+    color: #fff !important;
+}
+
+/* Add-board card: keep transparent/dashed, just strip blur */
+body.no-glass .add-board-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: none !important;
+}
+
+/* ── Glass toggle in appearance panel ── */
+.glass-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding: 0 2px;
+}
+.glass-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-sub);
+}
+.glass-toggle-label svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    color: var(--text-muted);
+}
+.glass-switch {
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    cursor: pointer;
+    position: relative;
+    transition:
+        background var(--transition),
+        border-color var(--transition);
+    flex-shrink: 0;
+    padding: 0;
+}
+.glass-switch.on {
+    background: var(--accent);
+    border-color: transparent;
+}
+.glass-switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition:
+        transform var(--transition),
+        background var(--transition);
+    display: block;
+}
+.glass-switch.on .glass-switch-thumb {
+    transform: translateX(16px);
+    background: #0a1008;
+}
+
+/* ── Board icon wrap — clickable ── */
+.board-icon-wrap {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    border-radius: 5px;
+    cursor: pointer;
+    transition:
+        background var(--transition),
+        color var(--transition);
+    font-size: 14px;
+    line-height: 1;
+}
+.board-icon-wrap:hover {
+    background: var(--bg3);
+    color: var(--accent);
+}
+.board-icon-wrap.nerd-icon {
+    font-family: "Symbols Nerd Font", "Nerd Font", monospace;
+    font-size: 15px;
+}
+
+/* ── Board icon picker popup ── */
+.icon-picker-popup {
+    position: fixed;
+    z-index: 300;
+    background: var(--glass-bg-heavy);
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 10px;
+    width: 240px;
+    box-shadow: var(--shadow-md);
+    animation: fadeUp 0.15s ease;
+}
+.bip-tabs {
+    display: flex;
+    gap: 3px;
+    background: var(--bg3);
+    border-radius: 7px;
+    padding: 3px;
+    margin-bottom: 9px;
+}
+.bip-tab {
+    flex: 1;
+    padding: 4px 0;
+    border: none;
+    border-radius: 5px;
+    background: none;
+    color: var(--text-sub);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+.bip-tab.active {
+    background: var(--accent);
+    color: #0a1008;
+    font-weight: 600;
+}
+.bip-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+}
+.bip-icon-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+    color: var(--text-sub);
+    transition: all var(--transition);
+}
+.bip-icon-btn:hover {
+    background: var(--bg3);
+    color: var(--text);
+    border-color: var(--border);
+}
+.bip-icon-btn.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.bip-nerd-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 7px;
+}
+.bip-nerd-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: "Symbols Nerd Font", "Nerd Font", monospace, var(--font);
+    font-size: 20px;
+    outline: none;
+    margin-bottom: 7px;
+    text-align: center;
+    letter-spacing: 0.1em;
+    transition: border-color var(--transition);
+}
+.bip-nerd-input:focus {
+    border-color: var(--accent);
+}
+.bip-nerd-confirm {
+    width: 100%;
+    margin-top: 0;
+}
+.bip-reset {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 5px;
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-family: var(--font);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+.bip-reset:hover {
+    border-color: #f87171;
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.06);
 }
