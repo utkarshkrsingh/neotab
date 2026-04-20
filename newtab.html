@@ -79,6 +79,28 @@
                     />
                 </svg>
             </button>
+
+            <label class="fab" id="btn-import" title="Import Data">
+                <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M10 13.5v-8M6.5 9L10 5.5 13.5 9" />
+                    <path
+                        d="M3.5 14.5v.5A1.5 1.5 0 005 16.5h10a1.5 1.5 0 001.5-1.5v-.5"
+                    />
+                </svg>
+                <input
+                    type="file"
+                    id="import-file-input"
+                    accept="application/json"
+                    style="display: none"
+                />
+            </label>
         </div>
 
         <!-- Wallpaper Panel -->
@@ -103,6 +125,38 @@
                 <button class="style-btn" data-mode="light">Light</button>
             </div>
 
+            <div class="glass-toggle-row">
+                <span class="glass-toggle-label">
+                    <svg
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <rect x="2" y="2" width="12" height="12" rx="3" />
+                        <path d="M2 6h12M6 2v12" stroke-opacity="0.5" />
+                        <rect
+                            x="2"
+                            y="2"
+                            width="12"
+                            height="12"
+                            rx="3"
+                            fill="currentColor"
+                            fill-opacity="0.06"
+                        />
+                    </svg>
+                    Glass effect
+                </span>
+                <button
+                    class="glass-switch"
+                    id="glass-toggle"
+                    title="Toggle glassmorphism"
+                >
+                    <span class="glass-switch-thumb"></span>
+                </button>
+            </div>
             <div class="wp-section-label">DARK</div>
             <div class="wallpaper-grid" id="wallpaper-grid">
                 <div class="wallpaper-item active" data-wp="default">
@@ -167,6 +221,38 @@
             </label>
         </div>
 
+        <!-- Board Icon Picker -->
+        <div
+            class="icon-picker-popup"
+            id="board-icon-picker"
+            style="display: none"
+        >
+            <div class="bip-tabs">
+                <button class="bip-tab active" data-tab="svg">Icons</button>
+                <button class="bip-tab" data-tab="nerd">Nerd Font</button>
+            </div>
+            <div class="bip-panel" id="bip-svg-panel">
+                <div class="bip-grid" id="bip-svg-grid"></div>
+            </div>
+            <div class="bip-panel" id="bip-nerd-panel" style="display: none">
+                <div class="bip-nerd-hint">Paste or type a Nerd Font glyph</div>
+                <input
+                    class="bip-nerd-input"
+                    id="bip-nerd-input"
+                    placeholder="e.g.  or "
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+                <button
+                    class="bip-nerd-confirm modal-btn"
+                    id="bip-nerd-confirm"
+                >
+                    Use Glyph
+                </button>
+            </div>
+            <button class="bip-reset" id="bip-reset">Reset to auto</button>
+        </div>
+
         <!-- Add Board Modal -->
         <div class="modal-overlay" id="board-modal">
             <div class="modal">
@@ -200,7 +286,7 @@
         <div class="modal-overlay" id="link-modal">
             <div class="modal">
                 <div class="modal-header">
-                    <span>Add Link</span>
+                    <span id="link-modal-title">Add Link</span>
                     <button class="icon-btn" id="close-link-modal">
                         <svg
                             viewBox="0 0 16 16"
@@ -231,6 +317,76 @@
                     placeholder="Description (optional)"
                     autocomplete="off"
                 />
+                <!-- Custom icon section -->
+                <div class="icon-picker">
+                    <div class="icon-picker-label">
+                        Custom icon
+                        <span class="icon-picker-optional">(optional)</span>
+                    </div>
+                    <div class="icon-picker-row">
+                        <div class="icon-preview" id="icon-preview">
+                            <svg
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <circle cx="10" cy="10" r="7" />
+                                <path
+                                    d="M10 3c0 0-3 3-3 7s3 7 3 7M10 3c0 0 3 3 3 7s-3 7-3 7M3 10h14"
+                                />
+                            </svg>
+                        </div>
+                        <div class="icon-picker-inputs">
+                            <input
+                                class="modal-input"
+                                id="link-icon-url-input"
+                                placeholder="Icon URL (https://…)"
+                                autocomplete="off"
+                            />
+                            <label class="icon-upload-btn">
+                                <svg
+                                    viewBox="0 0 16 16"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M8 10V3M5 6l3-3 3 3" />
+                                    <path
+                                        d="M3 12v.5A1.5 1.5 0 004.5 14h7a1.5 1.5 0 001.5-1.5V12"
+                                    />
+                                </svg>
+                                Upload image
+                                <input
+                                    type="file"
+                                    id="link-icon-file-input"
+                                    accept="image/*"
+                                    style="display: none"
+                                />
+                            </label>
+                        </div>
+                    </div>
+                    <button
+                        class="icon-clear-btn"
+                        id="icon-clear-btn"
+                        style="display: none"
+                    >
+                        <svg
+                            viewBox="0 0 10 10"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        >
+                            <path d="M2 2l6 6M8 2L2 8" />
+                        </svg>
+                        Clear custom icon
+                    </button>
+                </div>
                 <button class="modal-btn" id="confirm-add-link">
                     Add Link
                 </button>
