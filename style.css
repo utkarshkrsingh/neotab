@@ -880,7 +880,46 @@ body.privacy .link-icon {
     background: var(--accent-dim);
 }
 
-/* Custom wallpaper thumbnail items */
+/* Video URL input row */
+.wp-url-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    align-items: center;
+}
+.wp-url-input {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 12px;
+    outline: none;
+    transition: border-color var(--transition);
+    min-width: 0;
+}
+.wp-url-input::placeholder { color: var(--text-muted); }
+.wp-url-input:focus { border-color: var(--accent); }
+.wp-url-btn {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: #0a1008;
+    transition: background var(--transition);
+}
+.wp-url-btn svg { width: 13px; height: 13px; }
+.wp-url-btn:hover { background: #22c55e; }
+
+
 .wp-custom-item {
     position: relative;
     border-radius: 9px;
@@ -1130,7 +1169,71 @@ body.wallpaper-custom #wallpaper-overlay {
     opacity: 0.75;
 }
 
-/* ── No-glass override ── */
+/* ── Live wallpaper: canvas & video ── */
+#live-canvas,
+#live-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+#live-video {
+    object-fit: cover;
+}
+body.wallpaper-live #live-canvas,
+body.wallpaper-video #live-video {
+    display: block;
+}
+
+/* ── Live wallpaper thumbnail previews ── */
+.wp-live-particles { background: radial-gradient(ellipse at 60% 40%, #0a1628, #050e1a); }
+.wp-live-aurora    { background: linear-gradient(135deg, #030f0a 0%, #0a1f2e 50%, #0d0820 100%); }
+.wp-live-matrix    { background: #000d00; }
+.wp-live-starfield { background: radial-gradient(ellipse at 50% 50%, #0a0a1a, #000005); }
+
+.wp-preview {
+    flex-direction: column;
+    gap: 4px;
+}
+.live-badge {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    background: rgba(74, 222, 128, 0.15);
+    border: 1px solid rgba(74, 222, 128, 0.35);
+    border-radius: 4px;
+    padding: 1px 5px;
+    line-height: 1.6;
+}
+.wp-live-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+}
+
+/* Custom video thumbnail */
+.wp-custom-item.video-item::after {
+    content: "▶";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: rgba(255,255,255,0.7);
+    background: rgba(0,0,0,0.35);
+    pointer-events: none;
+}
+.wp-custom-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
 /* Strip blur from all glassed elements */
 body.no-glass .board,
 body.no-glass .tab,

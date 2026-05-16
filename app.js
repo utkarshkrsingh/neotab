@@ -48,6 +48,7 @@ let state = {
     privacy: false,
     glass: true,
     customWallpapers: [], // [{ id, dataUrl }]
+    customVideos: [],    // [{ id, dataUrl, mimeType }]
 };
 
 // ── Default pages ──
@@ -280,18 +281,262 @@ function faviconUrl(url) {
     }
 }
 
+// ── Live Wallpaper Engine ──
+const LiveWP = (() => {
+    let _raf = null;
+    let _current = null;
+
+    const canvas = () => document.getElementById("live-canvas");
+    const ctx = () => canvas().getContext("2d");
+
+    function stop() {
+        if (_raf) { cancelAnimationFrame(_raf); _raf = null; }
+        _current = null;
+        const c = canvas();
+        if (c) { const cx = ctx(); if (cx) cx.clearRect(0, 0, c.width, c.height); }
+    }
+
+    function resize() {
+        const c = canvas();
+        if (!c) return;
+        c.width  = window.innerWidth;
+        c.height = window.innerHeight;
+    }
+
+    function loop(fn) {
+        function frame() { fn(); _raf = requestAnimationFrame(frame); }
+        _raf = requestAnimationFrame(frame);
+    }
+
+    // ── Particles ──
+    function startParticles() {
+        resize();
+        const c = canvas(), cx = ctx();
+        const W = () => c.width, H = () => c.height;
+        const N = 120;
+        const dots = Array.from({ length: N }, () => ({
+            x: Math.random() * innerWidth,
+            y: Math.random() * innerHeight,
+            r: Math.random() * 1.8 + 0.4,
+            vx: (Math.random() - 0.5) * 0.35,
+            vy: (Math.random() - 0.5) * 0.35,
+            a: Math.random(),
+        }));
+        const LINK = 130;
+
+        loop(() => {
+            cx.clearRect(0, 0, W(), H());
+            dots.forEach(d => {
+                d.x += d.vx; d.y += d.vy;
+                if (d.x < 0) d.x = W(); if (d.x > W()) d.x = 0;
+                if (d.y < 0) d.y = H(); if (d.y > H()) d.y = 0;
+            });
+            // lines
+            for (let i = 0; i < dots.length; i++) {
+                for (let j = i + 1; j < dots.length; j++) {
+                    const dx = dots[i].x - dots[j].x, dy = dots[i].y - dots[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < LINK) {
+                        cx.beginPath();
+                        cx.moveTo(dots[i].x, dots[i].y);
+                        cx.lineTo(dots[j].x, dots[j].y);
+                        cx.strokeStyle = `rgba(74,222,128,${(1 - dist / LINK) * 0.18})`;
+                        cx.lineWidth = 0.8;
+                        cx.stroke();
+                    }
+                }
+            }
+            // dots
+            dots.forEach(d => {
+                cx.beginPath();
+                cx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+                cx.fillStyle = `rgba(74,222,128,${0.45 + d.a * 0.4})`;
+                cx.fill();
+            });
+        });
+    }
+
+    // ── Aurora ──
+    function startAurora() {
+        resize();
+        const c = canvas(), cx = ctx();
+        let t = 0;
+
+        const bands = [
+            { color1: [16, 185, 129], color2: [6, 78, 119], yBase: 0.3, amp: 0.12, freq: 0.7, speed: 0.0003 },
+            { color1: [124, 58, 237], color2: [16, 185, 129], yBase: 0.5, amp: 0.10, freq: 0.9, speed: 0.00022 },
+            { color1: [6, 182, 212],  color2: [79, 70, 229],  yBase: 0.65, amp: 0.08, freq: 1.1, speed: 0.00038 },
+        ];
+
+        loop(() => {
+            t += 1;
+            cx.clearRect(0, 0, c.width, c.height);
+            cx.fillStyle = "#03090b";
+            cx.fillRect(0, 0, c.width, c.height);
+
+            bands.forEach(b => {
+                const grad = cx.createLinearGradient(0, 0, 0, c.height);
+                const [r1,g1,bl1] = b.color1, [r2,g2,bl2] = b.color2;
+                grad.addColorStop(0, `rgba(${r1},${g1},${bl1},0)`);
+                grad.addColorStop(0.5, `rgba(${r1},${g1},${bl1},0.22)`);
+                grad.addColorStop(1, `rgba(${r2},${g2},${bl2},0)`);
+
+                cx.beginPath();
+                cx.moveTo(0, c.height);
+                const steps = 80;
+                for (let i = 0; i <= steps; i++) {
+                    const x = (i / steps) * c.width;
+                    const y = c.height * b.yBase
+                        + Math.sin(i * b.freq * 0.05 + t * b.speed * 800) * c.height * b.amp
+                        + Math.sin(i * b.freq * 0.03 + t * b.speed * 600 + 1) * c.height * b.amp * 0.5;
+                    cx.lineTo(x, y);
+                }
+                cx.lineTo(c.width, c.height);
+                cx.closePath();
+                cx.fillStyle = grad;
+                cx.fill();
+            });
+        });
+    }
+
+    // ── Matrix ──
+    function startMatrix() {
+        resize();
+        const c = canvas(), cx = ctx();
+        const COL_W = 18;
+        const cols = Math.floor(c.width / COL_W);
+        const drops = Array.from({ length: cols }, () => Math.random() * -50);
+        const CHARS = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ01アABCDE";
+
+        loop(() => {
+            cx.fillStyle = "rgba(0,10,0,0.045)";
+            cx.fillRect(0, 0, c.width, c.height);
+
+            drops.forEach((y, i) => {
+                const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
+                const x = i * COL_W;
+
+                // Bright head
+                cx.fillStyle = "#9fff9f";
+                cx.font = `bold 14px monospace`;
+                cx.fillText(ch, x, y * 18);
+
+                // Trail
+                cx.fillStyle = `rgba(0,200,60,0.85)`;
+                cx.font = `13px monospace`;
+                cx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, (y - 1) * 18);
+
+                if (y * 18 > c.height && Math.random() > 0.975) drops[i] = 0;
+                else drops[i] += 0.2;
+            });
+        });
+    }
+
+    // ── Starfield ──
+    function startStarfield() {
+        resize();
+        const c = canvas(), cx = ctx();
+        const CX = c.width / 2, CY = c.height / 2;
+        const N = 600;
+        const stars = Array.from({ length: N }, () => ({
+            x: (Math.random() - 0.5) * c.width * 3,
+            y: (Math.random() - 0.5) * c.height * 3,
+            z: Math.random() * c.width,
+            pz: 0,
+        }));
+        stars.forEach(s => s.pz = s.z);
+
+        loop(() => {
+            cx.fillStyle = "rgba(2,2,12,0.25)";
+            cx.fillRect(0, 0, c.width, c.height);
+
+            stars.forEach(s => {
+                s.pz = s.z;
+                s.z -= 2.2;
+                if (s.z <= 0) {
+                    s.x = (Math.random() - 0.5) * c.width * 3;
+                    s.y = (Math.random() - 0.5) * c.height * 3;
+                    s.z = c.width;
+                    s.pz = s.z;
+                }
+
+                const sx = (s.x / s.z) * c.width + CX;
+                const sy = (s.y / s.z) * c.height + CY;
+                const px = (s.x / s.pz) * c.width + CX;
+                const py = (s.y / s.pz) * c.height + CY;
+
+                const size = Math.max(0, (1 - s.z / c.width) * 2.5);
+                const bright = Math.floor((1 - s.z / c.width) * 255);
+
+                cx.beginPath();
+                cx.moveTo(px, py);
+                cx.lineTo(sx, sy);
+                cx.strokeStyle = `rgba(${bright},${bright},${255},${size * 0.6})`;
+                cx.lineWidth = size * 0.9;
+                cx.stroke();
+            });
+        });
+    }
+
+    function start(type) {
+        if (_current === type) return;
+        stop();
+        _current = type;
+        resize();
+        window.addEventListener("resize", resize);
+        switch (type) {
+            case "live-particles": startParticles(); break;
+            case "live-aurora":    startAurora();    break;
+            case "live-matrix":    startMatrix();    break;
+            case "live-starfield": startStarfield(); break;
+        }
+    }
+
+    return { start, stop };
+})();
+
 // ── Render ──
 function render() {
     const isCustom = state.wallpaper.startsWith("custom-");
+    const isVideo  = state.wallpaper.startsWith("video-");
+    const isLive   = state.wallpaper.startsWith("live-");
 
     document.body.className = [
         `theme-${state.theme}`,
-        isCustom ? "wallpaper-custom" : `wallpaper-${state.wallpaper}`,
+        isCustom ? "wallpaper-custom"
+        : isVideo ? "wallpaper-video"
+        : isLive  ? "wallpaper-live"
+        : `wallpaper-${state.wallpaper}`,
         state.privacy ? "privacy" : "",
         state.glass ? "" : "no-glass",
     ]
         .filter(Boolean)
         .join(" ");
+
+    // Handle live canvas
+    if (isLive) {
+        LiveWP.start(state.wallpaper);
+    } else {
+        LiveWP.stop();
+    }
+
+    // Handle video wallpaper
+    const videoEl = document.getElementById("live-video");
+    if (isVideo) {
+        const cv = (state.customVideos || []).find(v => v.id === state.wallpaper);
+        if (cv && videoEl.dataset.activeId !== cv.id) {
+            videoEl.src = cv.dataUrl;
+            videoEl.dataset.activeId = cv.id;
+            videoEl.load();
+            videoEl.play().catch(() => {});
+        }
+    } else {
+        if (videoEl && videoEl.src) {
+            videoEl.pause();
+            videoEl.removeAttribute("src");
+            videoEl.dataset.activeId = "";
+        }
+    }
 
     // Sync glass toggle
     const glassToggle = document.getElementById("glass-toggle");
@@ -313,7 +558,7 @@ function render() {
         .getElementById("btn-privacy")
         .classList.toggle("privacy-on", state.privacy);
 
-    // Sync active state on all preset wallpaper items
+    // Sync active state on all preset wallpaper items (including live)
     document.querySelectorAll(".wallpaper-item").forEach((el) => {
         el.classList.toggle("active", el.dataset.wp === state.wallpaper);
     });
@@ -350,6 +595,40 @@ function render() {
             item.appendChild(delBtn);
             item.addEventListener("click", () => {
                 state.wallpaper = cw.id;
+                save();
+                render();
+            });
+            cGrid.appendChild(item);
+        });
+
+        // Render custom video thumbnails
+        (state.customVideos || []).forEach((cv) => {
+            const item = document.createElement("div");
+            item.className =
+                "wp-custom-item video-item" + (state.wallpaper === cv.id ? " active" : "");
+            item.dataset.id = cv.id;
+
+            const vid = document.createElement("video");
+            vid.src = cv.dataUrl;
+            vid.muted = true;
+            vid.preload = "metadata";
+
+            const delBtn = document.createElement("button");
+            delBtn.className = "wp-del";
+            delBtn.title = "Remove";
+            delBtn.innerHTML = `<svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5l6 6M7.5 1.5l-6 6"/></svg>`;
+            delBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                state.customVideos = state.customVideos.filter(v => v.id !== cv.id);
+                if (state.wallpaper === cv.id) state.wallpaper = "default";
+                save();
+                render();
+            });
+
+            item.appendChild(vid);
+            item.appendChild(delBtn);
+            item.addEventListener("click", () => {
+                state.wallpaper = cv.id;
                 save();
                 render();
             });
@@ -893,7 +1172,7 @@ function bindEvents() {
     });
 
     // Wallpaper selection — preset grids
-    ["wallpaper-grid", "wallpaper-grid-light"].forEach((gridId) => {
+    ["wallpaper-grid", "wallpaper-grid-light", "wallpaper-grid-live"].forEach((gridId) => {
         document.getElementById(gridId).addEventListener("click", (e) => {
             const item = e.target.closest(".wallpaper-item");
             if (!item) return;
@@ -939,6 +1218,52 @@ function bindEvents() {
             };
             reader.readAsDataURL(file);
             e.target.value = ""; // reset so same file can be re-uploaded
+        });
+
+    // Video URL add
+    const videoUrlConfirm = () => {
+        const input = document.getElementById("wp-video-url-input");
+        const url = input.value.trim();
+        if (!url) return;
+        if (!/^https?:\/\/.+\.(mp4|webm)(\?.*)?$/i.test(url)) {
+            alert("Please enter a direct video URL ending in .mp4 or .webm");
+            return;
+        }
+        const id = "video-" + uid();
+        if (!state.customVideos) state.customVideos = [];
+        state.customVideos.push({ id, dataUrl: url, mimeType: url.toLowerCase().includes(".webm") ? "video/webm" : "video/mp4" });
+        state.wallpaper = id;
+        input.value = "";
+        save();
+        render();
+    };
+    document.getElementById("wp-video-url-confirm").addEventListener("click", videoUrlConfirm);
+    document.getElementById("wp-video-url-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") videoUrlConfirm();
+    });
+
+    // Custom video upload
+    document
+        .getElementById("wp-video-upload-input")
+        .addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 50 * 1024 * 1024) {
+                alert("Video is too large. Please use a file under 50 MB.");
+                e.target.value = "";
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const id = "video-" + uid();
+                if (!state.customVideos) state.customVideos = [];
+                state.customVideos.push({ id, dataUrl: ev.target.result, mimeType: file.type });
+                state.wallpaper = id;
+                save();
+                render();
+            };
+            reader.readAsDataURL(file);
+            e.target.value = "";
         });
 
     // Export

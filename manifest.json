@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "NeoTab - Smart New Tab",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "A beautiful new tab page with organized bookmarks, pages, and wallpaper customization.",
 
     "chrome_url_overrides": {

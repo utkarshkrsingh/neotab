@@ -12,7 +12,10 @@
         <link rel="stylesheet" href="style.css" />
     </head>
     <body class="theme-dark wallpaper-default">
-        <div id="wallpaper-overlay"></div>
+        <div id="wallpaper-overlay">
+            <canvas id="live-canvas"></canvas>
+            <video id="live-video" autoplay loop muted playsinline></video>
+        </div>
         <div class="grid-lines"></div>
 
         <!-- FAB Sidebar -->
@@ -73,7 +76,7 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                 >
-                    <path d="M10 3.5v8M6.5 8L10 11.5 13.5 8" />
+                    <path d="M10 13.5v-8M6.5 9L10 5.5 13.5 9" />
                     <path
                         d="M3.5 14.5v.5A1.5 1.5 0 005 16.5h10a1.5 1.5 0 001.5-1.5v-.5"
                     />
@@ -89,7 +92,7 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                 >
-                    <path d="M10 13.5v-8M6.5 9L10 5.5 13.5 9" />
+                    <path d="M10 3.5v8M6.5 8L10 11.5 13.5 8" />
                     <path
                         d="M3.5 14.5v.5A1.5 1.5 0 005 16.5h10a1.5 1.5 0 001.5-1.5v-.5"
                     />
@@ -194,8 +197,83 @@
                 </div>
             </div>
 
+            <div class="wp-section-label" style="margin-top: 14px">LIVE</div>
+            <div class="wallpaper-grid" id="wallpaper-grid-live">
+                <div class="wallpaper-item" data-wp="live-particles">
+                    <div class="wp-preview wp-live-particles">
+                        <span class="live-badge">LIVE</span>
+                        <span class="wp-live-label">Particles</span>
+                    </div>
+                </div>
+                <div class="wallpaper-item" data-wp="live-aurora">
+                    <div class="wp-preview wp-live-aurora">
+                        <span class="live-badge">LIVE</span>
+                        <span class="wp-live-label">Aurora</span>
+                    </div>
+                </div>
+                <div class="wallpaper-item" data-wp="live-matrix">
+                    <div class="wp-preview wp-live-matrix">
+                        <span class="live-badge">LIVE</span>
+                        <span class="wp-live-label">Matrix</span>
+                    </div>
+                </div>
+                <div class="wallpaper-item" data-wp="live-starfield">
+                    <div class="wp-preview wp-live-starfield">
+                        <span class="live-badge">LIVE</span>
+                        <span class="wp-live-label">Starfield</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="wp-section-label" style="margin-top: 14px">CUSTOM</div>
             <div class="wallpaper-grid" id="wallpaper-grid-custom"></div>
+
+            <label class="wp-upload-btn" id="wp-video-upload-label">
+                <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <rect x="2" y="5" width="12" height="10" rx="2" />
+                    <path d="M14 8.5l4-2v7l-4-2V8.5z" />
+                </svg>
+                Upload video loop
+                <input
+                    type="file"
+                    id="wp-video-upload-input"
+                    accept="video/mp4,video/webm"
+                    style="display: none"
+                />
+            </label>
+
+            <div class="wp-url-row">
+                <input
+                    class="wp-url-input"
+                    id="wp-video-url-input"
+                    placeholder="Paste video URL (mp4 / webm)…"
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+                <button
+                    class="wp-url-btn"
+                    id="wp-video-url-confirm"
+                    title="Add URL"
+                >
+                    <svg
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M2 7h10M8 3l4 4-4 4" />
+                    </svg>
+                </button>
+            </div>
 
             <label class="wp-upload-btn">
                 <svg
